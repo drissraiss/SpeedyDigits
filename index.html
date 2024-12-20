@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Number Matching Game</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Custom CSS -->
+  <style>
+    .hidden {
+      display: none;
+    }
+    .correct {
+      color: green;
+      text-decoration: underline solid;
+    }
+    .incorrect {
+      color: red;
+      text-decoration: underline solid;
+    }
+    .untyped {
+      color: black;
+    }
+    .input-error {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <div class="container text-center mt-5">
+    <h1>Games Won: <span id="gamesWon">0</span></h1>
+    <div id="randomNumber" class="display-4 mb-4"></div>
+    <input type="text" id="userInput" class="form-control" placeholder="Enter the number" autofocus>
+    <button id="checkBtn" class="btn btn-primary mt-3">Check</button>
+    <p id="message" class="mt-3 hidden"></p>
+    <p id="error-message" class="mt-3 hidden input-error">Please enter a valid number!</p>
+
+  </div>
+
+  <!-- Bootstrap JS & jQuery (for the Bootstrap components) -->
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  
+  <!-- Custom JS -->
+  <script>
+    // Function to generate a random number between 1 and 9999
+    function generateRandomNumber() {
+      return Math.floor(Math.random() * 9999) + 1;
+    }
+
+    // Function to update and style the random number while typing
+    function updateRandomNumberStyling() {
+      const userInput = document.getElementById('userInput').value;
+      const messageElement = document.getElementById('message');
+      const errorMessageElement = document.getElementById('error-message');
+
+      // Show error message if the input is not a valid number
+      const userNumber = parseInt(userInput, 10);
+      if (isNaN(userNumber) && userInput.length > 0) {
+        errorMessageElement.classList.remove('hidden');
+      } else {
+        errorMessageElement.classList.add('hidden');
+      }
+
+      // Split random number into individual digits
+      const randomNumberString = randomNumber.toString();
+      let styledNumber = '';
+
+      let correctInput = true; // flag to track if all digits are correct
+
+      // Iterate through each digit of the random number and style it
+      for (let i = 0; i < randomNumberString.length; i++) {
+        const randomDigit = randomNumberString[i];
+        const userDigit = userInput[i];
+
+        // If the user typed the correct digit at this position, style it as green
+        if (userDigit === randomDigit) {
+          styledNumber += `<span class="correct">${randomDigit}</span>`;
+        }
+        // If the user typed a digit that does not match, style it as red
+        else if (userDigit !== undefined) {
+          styledNumber += `<span class="incorrect">${randomDigit}</span>`;
+          correctInput = false; // mark that the input is incorrect
+        }
+        // If the digit has not been typed, display it in black
+        else {
+          styledNumber += `<span class="untyped">${randomDigit}</span>`;
+        }
+      }
+
+      // Update the random number with the styled digits
+      document.getElementById('randomNumber').innerHTML = styledNumber;
+
+      // Play sound based on whether the typed digit is correct or not
+      if (correctInput) {
+        correctSound.play();
+      } else {
+        incorrectSound.play();
+      }
+    }
+
+    // Function to check the user's guess when clicking the "Check" button
+    function checkGuess() {
+      let userInput = document.getElementById('userInput').value.trim(); // Trim spaces from input
+      const messageElement = document.getElementById('message');
+      const errorMessageElement = document.getElementById('error-message');
+
+      // Check if the input is a valid number
+      const userNumber = parseInt(userInput, 10);
+
+      // If the input is not a valid number
+      if (isNaN(userNumber) || userInput === "") {
+        errorMessageElement.classList.remove('hidden');
+        return;
+      } else {
+        errorMessageElement.classList.add('hidden');
+      }
+
+      // Play the appropriate sound based on the correctness of the guess
+      if (userInput === randomNumber.toString()) {
+        messageElement.textContent = 'Correct! Well done.';
+        messageElement.className = 'correct';
+        messageElement.classList.remove('hidden');
+
+        // Increment the games won counter
+        gamesWon++;
+        document.getElementById('gamesWon').textContent = gamesWon;
+
+        // Generate a new random number and reset the game state
+        randomNumber = generateRandomNumber();
+        document.getElementById('randomNumber').textContent = randomNumber;
+
+        resetInput();  // Clear input and reset message
+      } else {
+        messageElement.textContent = 'Incorrect! Try again.';
+        messageElement.className = 'incorrect';
+        messageElement.classList.remove('hidden');
+      }
+    }
+
+    // Function to reset the input and message display
+    function resetInput() {
+      document.getElementById('userInput').value = ''; // Clear input
+      document.getElementById('message').classList.add('hidden');
+      document.getElementById('error-message').classList.add('hidden');
+      document.getElementById('randomNumber').style.color = 'black';
+    }
+
+    // Generate the initial random number
+    let randomNumber = generateRandomNumber();
+    document.getElementById('randomNumber').textContent = randomNumber;
+
+    // Initialize the gamesWon counter
+    let gamesWon = 0;
+
+    // Audio elements for correct and incorrect guesses
+    const correctSound = new Audio('correct.mp3'); // Make sure the path is correct
+    const incorrectSound = new Audio('incorrect.mp3'); // Make sure the path is correct
+
+    // Event listener for the "Check" button
+    document.getElementById('checkBtn').addEventListener('click', checkGuess);
+
+    // Allow checking on pressing space or enter
+    document.addEventListener('keydown', function(event) {
+      if (event.key === " " || event.key === "Enter") {
+        event.preventDefault(); // Prevent spacebar or enter from being typed
+        checkGuess(); // Check the guess
+      }
+    });
+
+    // Continuously update styling while typing
+    document.getElementById('userInput').addEventListener('input', updateRandomNumberStyling);
+    document.getElementById('userInput').onblur = function () {
+      this.focus();
+    }
+  </script>
+</body>
+</html>
