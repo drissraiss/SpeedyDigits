@@ -1,0 +1,17 @@
+.hidden {
+  display: none;
+}
+.correct {
+  color: green;
+  text-decoration: underline solid;
+}
+.incorrect {
+  color: red;
+  text-decoration: underline solid;
+}
+.untyped {
+  color: black;
+}
+.input-error {
+  color: red;
+}
